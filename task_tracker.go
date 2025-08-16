@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -79,7 +80,10 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 		}
 	case "update":
 		if argumentsLength == 3 {
-			fmt.Println("Run update command")
+			id, err := strconv.Atoi(arguments[1])
+			check(err)
+			description := arguments[2]
+			update(dataID, id, tasks, description)
 		} else {
 			fmt.Println("No argument was found: Kindly Input argument for update command")
 		}
@@ -141,6 +145,40 @@ func add(dataID int, description string, tasks []Task) {
 	tasks = append(tasks, task)
 	updateData(id, tasks)
 	fmt.Println("The tasks variable  from add fucntion", tasks)
+}
+
+func update(dataID int, id int, tasks []Task, description string) {
+	start := 0
+	end := len(tasks) - 1
+	mid := (start + end) / 2
+	var currentTask Task
+	var currentTaskPosition int
+	for start <= end {
+		if tasks[mid].ID == id {
+			currentTask = tasks[mid]
+			currentTaskPosition = mid
+			break
+		}
+		if id > tasks[mid].ID {
+			start = mid + 1
+			mid = (start + end) / 2
+		}
+
+		if id < tasks[mid].ID {
+			end = mid - 1
+			mid = (start + end) / 2
+		}
+	}
+
+	if currentTask.ID == id {
+		updatedAt := time.Now().String()
+		updatedTask := Task{ID: id, Description: description, Status: currentTask.Status, CreatedAt: currentTask.CreatedAt, UpdatedAt: updatedAt}
+		tasks[currentTaskPosition] = updatedTask
+		updateData(dataID, tasks)
+	} else {
+		fmt.Println("TASK(ID)", id)
+		fmt.Println("Does not exist")
+	}
 }
 
 func main() {
