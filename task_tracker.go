@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 )
 
 type Task struct {
@@ -15,6 +16,7 @@ type Task struct {
 }
 
 type Data struct {
+	ID    int
 	Tasks []Task
 }
 
@@ -31,8 +33,8 @@ func checkFile(filename string) error {
 		if err != nil {
 			return err
 		}
-		tasks := make([]Task, 0)
-		dataBytes, err := json.Marshal(tasks)
+		data := Data{ID: 0, Tasks: make([]Task, 0)}
+		dataBytes, err := json.Marshal(data)
 		if err != nil {
 			return err
 		}
@@ -45,25 +47,27 @@ func checkFile(filename string) error {
 	return nil
 }
 
-func loadData() {
+func loadData() Data {
 	filename := "tasks.json"
-	var tasks []Task
+	var data Data
 	err := checkFile(filename)
 	check(err)
 
-	file, err := os.ReadFile("data.json")
+	file, err := os.ReadFile(filename)
 	check(err)
 
-	err = json.Unmarshal(file, &tasks)
+	err = json.Unmarshal(file, &data)
 	check(err)
+	return data
 }
 
-func checkCommand(arguments []string, argumentsLength int) {
+func commands(arguments []string, argumentsLength int, dataID int, tasks []Task) {
 	var command string = arguments[0]
 	switch command {
 	case "add":
 		if argumentsLength == 2 {
-			fmt.Println("Run add command")
+			description := arguments[1]
+			add(dataID, description, tasks)
 		} else {
 			fmt.Println("No argument was found: Kindly Input argument for add command")
 		}
@@ -117,15 +121,38 @@ func checkCommand(arguments []string, argumentsLength int) {
 	}
 }
 
+func updateData(dataID int, tasks []Task) {
+	data := Data{ID: dataID, Tasks: tasks}
+	dataBytes, err := json.Marshal(data)
+	check(err)
+
+	err = os.WriteFile("tasks.json", dataBytes, 0664)
+
+	check(err)
+}
+
+// Commmands
+
+func add(dataID int, description string, tasks []Task) {
+	id := dataID
+	id++
+	createdAt := time.Now().String()
+	task := Task{ID: id, Description: description, Status: "todo", CreatedAt: createdAt, UpdatedAt: createdAt}
+	tasks = append(tasks, task)
+	updateData(id, tasks)
+	fmt.Println("The tasks variable  from add fucntion", tasks)
+}
+
 func main() {
-	// var tasks []Task
-	loadData()
+	data := loadData()
+	dataID := data.ID
+	tasks := data.Tasks
 	arguments := os.Args[1:]
 	argumentsLength := len(arguments)
 	if argumentsLength == 0 {
 		fmt.Println("No command was entered: Kindly input a  command")
 		return
 	}
-	checkCommand(arguments, argumentsLength)
+	commands(arguments, argumentsLength, dataID, tasks)
 	fmt.Println("Length of arguments", argumentsLength)
 }
