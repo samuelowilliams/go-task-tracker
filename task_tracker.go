@@ -1,9 +1,62 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 )
+
+type Task struct {
+	ID          int
+	Description string
+	Status      string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
+type Data struct {
+	Tasks []Task
+}
+
+func check(e error) {
+	if e != nil {
+		fmt.Println("Error:", e)
+	}
+}
+
+func checkFile(filename string) error {
+	_, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		_, err := os.Create(filename)
+		if err != nil {
+			return err
+		}
+		tasks := make([]Task, 0)
+		dataBytes, err := json.Marshal(tasks)
+		if err != nil {
+			return err
+		}
+
+		err = os.WriteFile(filename, dataBytes, 0664)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func loadData() {
+	filename := "tasks.json"
+	var tasks []Task
+	err := checkFile(filename)
+	check(err)
+
+	file, err := os.ReadFile("data.json")
+	check(err)
+
+	err = json.Unmarshal(file, &tasks)
+	check(err)
+}
 
 func checkCommand(arguments []string, argumentsLength int) {
 	var command string = arguments[0]
@@ -65,6 +118,8 @@ func checkCommand(arguments []string, argumentsLength int) {
 }
 
 func main() {
+	// var tasks []Task
+	loadData()
 	arguments := os.Args[1:]
 	argumentsLength := len(arguments)
 	if argumentsLength == 0 {
