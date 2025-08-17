@@ -91,7 +91,9 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 		}
 	case "mark-in-progress":
 		if argumentsLength == 2 {
-			fmt.Println("Run mark-in-progress command")
+			id, err := strconv.Atoi(arguments[1])
+			check(err)
+			updateTaskStatus(dataID, id, tasks, "in-progress")
 		} else {
 			fmt.Println("No argument was found: Kindly Input argument for mark-in-progress command")
 		}
@@ -221,7 +223,7 @@ func delete(dataID int, id int, tasks []Task) {
 		fmt.Println("Does not exist")
 		return
 	}
-	for i := 1; i < len(tasks); i++ {
+	for i := 0; i < len(tasks); i++ {
 		if tasks[i].ID == id {
 			continue
 		} else {
@@ -230,6 +232,29 @@ func delete(dataID int, id int, tasks []Task) {
 	}
 	// tasks = append(tasks[:taskAndPosition.position], tasks[taskAndPosition.position:]...) // What does ... even mean? is this like javascript own ... copy operator
 	fmt.Println("The tasks after delete operations", tasksCopy)
+	updateData(dataID, tasksCopy)
+}
+
+func updateTaskStatus(dataID int, id int, tasks []Task, status string) {
+	updatedAt := time.Now().String()
+	var updatedTask Task
+	tasksCopy := []Task{}
+
+	taskAndPosition := findTask(id, tasks)
+	if taskAndPosition == (TaskAndPosition{}) {
+		fmt.Println("TASK(ID)", id)
+		fmt.Println("Does not exist")
+		return
+	}
+	for i := 0; i < len(tasks); i++ {
+		if tasks[i].ID == id {
+			updatedTask = Task{ID: tasks[i].ID, Description: tasks[i].Description, Status: status, CreatedAt: tasks[i].CreatedAt, UpdatedAt: updatedAt}
+			tasksCopy = append(tasksCopy, updatedTask)
+		} else {
+			tasksCopy = append(tasksCopy, tasks[i])
+		}
+	}
+
 	updateData(dataID, tasksCopy)
 }
 
