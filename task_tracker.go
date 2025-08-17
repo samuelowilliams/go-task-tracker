@@ -74,7 +74,9 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 		}
 	case "delete":
 		if argumentsLength == 2 {
-			fmt.Println("Run delete command")
+			id, err := strconv.Atoi(arguments[1])
+			check(err)
+			delete(dataID, id, tasks)
 		} else {
 			fmt.Println("No argument was found: Kindly Input argument for delete command")
 		}
@@ -135,6 +137,36 @@ func updateData(dataID int, tasks []Task) {
 	check(err)
 }
 
+type TaskAndPosition struct {
+	position int
+	task     Task
+}
+
+func findTask(id int, tasks []Task) TaskAndPosition {
+	start := 0
+	end := len(tasks) - 1
+	mid := (start + end) / 2
+	var taskAndPosition TaskAndPosition
+	for start <= end {
+		if id == tasks[mid].ID {
+			taskAndPosition = TaskAndPosition{position: mid, task: tasks[mid]}
+			break
+		}
+
+		if id > tasks[mid].ID {
+			start = mid + 1
+			mid = (start + end) / 2
+		}
+
+		if id < tasks[mid].ID {
+			end = mid - 1
+			mid = (start + end) / 2
+		}
+	}
+
+	return taskAndPosition
+}
+
 // Commmands
 
 func add(dataID int, description string, tasks []Task) {
@@ -179,6 +211,26 @@ func update(dataID int, id int, tasks []Task, description string) {
 		fmt.Println("TASK(ID)", id)
 		fmt.Println("Does not exist")
 	}
+}
+
+func delete(dataID int, id int, tasks []Task) {
+	tasksCopy := []Task{}
+	taskAndPosition := findTask(id, tasks)
+	if taskAndPosition == (TaskAndPosition{}) {
+		fmt.Println("TASK(ID)", id)
+		fmt.Println("Does not exist")
+		return
+	}
+	for i := 1; i < len(tasks); i++ {
+		if tasks[i].ID == id {
+			continue
+		} else {
+			tasksCopy = append(tasksCopy, tasks[i])
+		}
+	}
+	// tasks = append(tasks[:taskAndPosition.position], tasks[taskAndPosition.position:]...) // What does ... even mean? is this like javascript own ... copy operator
+	fmt.Println("The tasks after delete operations", tasksCopy)
+	updateData(dataID, tasksCopy)
 }
 
 func main() {
