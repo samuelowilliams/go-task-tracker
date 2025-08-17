@@ -106,7 +106,6 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 			fmt.Println("No argument was found: Kindly Input argument for mark-done command")
 		}
 	case "list":
-
 		var subCommand string
 		if argumentsLength == 2 {
 			subCommand = arguments[1]
@@ -115,15 +114,12 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 		}
 		switch subCommand {
 		case "todo":
-
-			fmt.Println("Run list todo command")
+			listByTaskStatus("todo", tasks)
 
 		case "in-progress":
-
-			fmt.Println("Run list in-progress command")
+			listByTaskStatus("in-progress", tasks)
 		case "done":
-
-			fmt.Println("Run list done command")
+			listByTaskStatus("done", tasks)
 		default:
 			list(tasks)
 		}
@@ -273,6 +269,58 @@ func list(tasks []Task) {
 			tasks[i].CreatedAt,
 			tasks[i].UpdatedAt,
 		)
+	}
+}
+
+func listByTaskStatus(status string, tasks []Task) {
+	fmt.Println(" (ID)          			Description          	   Status          CreatedAt          UpdatedAt ")
+	fmt.Println(" ==========    			==========          	==========      ==========         ==========")
+
+	if status == "done" {
+		for i := 0; i < len(tasks); i++ {
+			if tasks[i].Status == status {
+				fmt.Printf(
+					" %10d %30s %20s %20s %20s\n",
+					tasks[i].ID,
+					tasks[i].Description,
+					tasks[i].Status,
+					tasks[i].CreatedAt,
+					tasks[i].UpdatedAt,
+				)
+			} else {
+				continue
+			}
+		}
+	} else if status == "todo" {
+		for i := 0; i < len(tasks); i++ {
+			if tasks[i].Status == status {
+				fmt.Printf(
+					" %10d %30s %20s %20s %20s\n",
+					tasks[i].ID,
+					tasks[i].Description,
+					tasks[i].Status,
+					tasks[i].CreatedAt,
+					tasks[i].UpdatedAt,
+				)
+			} else {
+				continue
+			}
+		}
+	} else if status == "in-progress" {
+		for i := 0; i < len(tasks); i++ {
+			if tasks[i].Status == status {
+				fmt.Printf(
+					" %10d %30s %20s %20s %20s\n",
+					tasks[i].ID,
+					tasks[i].Description,
+					tasks[i].Status,
+					tasks[i].CreatedAt,
+					tasks[i].UpdatedAt,
+				)
+			} else {
+				continue
+			}
+		}
 	}
 }
 
