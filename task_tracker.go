@@ -125,7 +125,7 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 
 			fmt.Println("Run list done command")
 		default:
-			fmt.Println("Run list command")
+			list(tasks)
 		}
 
 	}
@@ -176,7 +176,7 @@ func findTask(id int, tasks []Task) TaskAndPosition {
 func add(dataID int, description string, tasks []Task) {
 	id := dataID
 	id++
-	createdAt := time.Now().String()
+	createdAt := time.Now().Format("2006-1-1 15:4:5")
 	task := Task{ID: id, Description: description, Status: "todo", CreatedAt: createdAt, UpdatedAt: createdAt}
 	tasks = append(tasks, task)
 	updateData(id, tasks)
@@ -207,7 +207,7 @@ func update(dataID int, id int, tasks []Task, description string) {
 	}
 
 	if currentTask.ID == id {
-		updatedAt := time.Now().String()
+		updatedAt := time.Now().Format("2006-1-1 15:4:5")
 		updatedTask := Task{ID: id, Description: description, Status: currentTask.Status, CreatedAt: currentTask.CreatedAt, UpdatedAt: updatedAt}
 		tasks[currentTaskPosition] = updatedTask
 		updateData(dataID, tasks)
@@ -238,7 +238,8 @@ func delete(dataID int, id int, tasks []Task) {
 }
 
 func updateTaskStatus(dataID int, id int, tasks []Task, status string) {
-	updatedAt := time.Now().String()
+	updatedAt := time.Now().Format("2006-1-1 15:4:5")
+
 	var updatedTask Task
 	tasksCopy := []Task{}
 
@@ -258,6 +259,21 @@ func updateTaskStatus(dataID int, id int, tasks []Task, status string) {
 	}
 
 	updateData(dataID, tasksCopy)
+}
+
+func list(tasks []Task) {
+	fmt.Println(" (ID)          			Description          	   Status          CreatedAt          UpdatedAt ")
+	fmt.Println(" ==========    			==========          	==========      ==========         ==========")
+	for i := 0; i < len(tasks); i++ {
+		fmt.Printf(
+			" %10d %30s %20s %20s %20s\n",
+			tasks[i].ID,
+			tasks[i].Description,
+			tasks[i].Status,
+			tasks[i].CreatedAt,
+			tasks[i].UpdatedAt,
+		)
+	}
 }
 
 func main() {
