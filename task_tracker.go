@@ -99,7 +99,9 @@ func commands(arguments []string, argumentsLength int, dataID int, tasks []Task)
 		}
 	case "mark-done":
 		if argumentsLength == 2 {
-			fmt.Println("Run mark-done command")
+			id, err := strconv.Atoi(arguments[1])
+			check(err)
+			updateTaskStatus(dataID, id, tasks, "done")
 		} else {
 			fmt.Println("No argument was found: Kindly Input argument for mark-done command")
 		}
