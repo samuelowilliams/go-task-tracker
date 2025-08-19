@@ -63,7 +63,7 @@ func loadData() Data {
 }
 
 func commands(arguments []string, argumentsLength int, dataID int, tasks []Task) {
-	var command string = arguments[0]
+	command := arguments[0]
 	switch command {
 	case "add":
 		if argumentsLength == 2 {
